@@ -19,13 +19,34 @@ import {
 } from 'lucide-react';
 
 const DEGREE_OPTIONS = [
-  "Bachelor's Degree",
-  "Master's Degree",
-  "Associate Degree",
-  "PhD / Doctorate",
-  "High School Diploma",
-  "Any Degree"
+  { value: "Bachelor", label: "Bachelor's Degree" },
+  { value: "Master", label: "Master's Degree" },
+  { value: "Associate", label: "Associate Degree" },
+  { value: "PhD", label: "Doctorate (PhD)" },
+  { value: "High School", label: "High School" }
 ];
+
+const normalizeDegreeValue = (val) => {
+  if (!val) return "Bachelor";
+  const s = String(val).toLowerCase().trim();
+  if (s.includes("phd") || s.includes("doctor")) return "PhD";
+  if (s.includes("master") || s.includes("msc") || s.includes("mba")) return "Master";
+  if (s.includes("bachelor") || s.includes("bsc") || s.includes("degree")) return "Bachelor";
+  if (s.includes("associate") || s.includes("diploma")) return "Associate";
+  if (s.includes("high school") || s.includes("secondary")) return "High School";
+  return val;
+};
+
+const formatDegreeDisplay = (val) => {
+  if (!val) return "Bachelor's Degree";
+  const s = String(val).toLowerCase().trim();
+  if (s.includes("phd") || s.includes("doctor")) return "Doctorate (PhD)";
+  if (s.includes("master") || s.includes("msc") || s.includes("mba")) return "Master's Degree";
+  if (s.includes("bachelor") || s.includes("bsc") || s.includes("degree")) return "Bachelor's Degree";
+  if (s.includes("associate") || s.includes("diploma")) return "Associate Degree";
+  if (s.includes("high school") || s.includes("secondary")) return "High School";
+  return val;
+};
 
 const POPULAR_SKILLS = [
   'Python', 'React', 'JavaScript', 'TypeScript', 'Node.js', 
@@ -91,7 +112,7 @@ export default function JobsList() {
     setEditSkills(Array.isArray(job.required_skills) ? [...job.required_skills] : []);
     setSkillInput('');
     setEditExp(job.experience_required !== undefined ? job.experience_required : (job.min_experience_years || 0));
-    setEditEdu(job.education_level || "Bachelor's Degree");
+    setEditEdu(normalizeDegreeValue(job.education_level));
     setEditLocation(job.location || '');
     setEditError('');
     setIsEditModalOpen(true);
@@ -297,7 +318,7 @@ export default function JobsList() {
                   </div>
                   <div className="flex items-center gap-1 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200">
                     <GraduationCap className="w-3 h-3 text-slate-400" />
-                    <span>{job.education_level || "Bachelor's Degree"}</span>
+                    <span>{formatDegreeDisplay(job.education_level)}</span>
                   </div>
                 </div>
 
@@ -424,8 +445,8 @@ export default function JobsList() {
                     className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     {DEGREE_OPTIONS.map((deg) => (
-                      <option key={deg} value={deg}>
-                        {deg}
+                      <option key={deg.value} value={deg.value}>
+                        {deg.label}
                       </option>
                     ))}
                   </select>
